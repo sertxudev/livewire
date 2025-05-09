@@ -47,7 +47,7 @@ class BrowserTest extends BrowserTestCase
                 <div>
                     <button wire:click="foo" dusk="button">Dispatch "foo"</button>
 
-                    <span x-data x-on:foo="$el.textContent = 'bar'" dusk="target" wire:ignore></span>
+                    <span x-data x-on:foo.window="$el.textContent = 'bar'" dusk="target" wire:ignore></span>
                 </div>
                 HTML;
             }
