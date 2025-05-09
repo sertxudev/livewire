@@ -34,6 +34,29 @@ class BrowserTest extends BrowserTestCase
         ->assertSeeIn('@target', 'bar');
     }
 
+    public function test_can_listen_for_component_event_with_x_on_in_javascript()
+    {
+        Livewire::visit(new class extends Component {
+            function foo() {
+                $this->dispatch('foo');
+            }
+
+            function render()
+            {
+                return <<<'HTML'
+                <div>
+                    <button wire:click="foo" dusk="button">Dispatch "foo"</button>
+
+                    <span x-data x-on:foo="$el.textContent = 'bar'" dusk="target" wire:ignore></span>
+                </div>
+                HTML;
+            }
+        })
+        ->assertDontSeeIn('@target', 'bar')
+        ->waitForLivewire()->click('@button')
+        ->assertSeeIn('@target', 'bar');
+    }
+
     public function test_dont_call_render_on_renderless_event_handler()
     {
         Livewire::visit(new class extends Component {
