@@ -68,6 +68,38 @@ class UnitTest extends TestCase
             ->assertSetStrict('count', 2);
     }
 
+    function test_computed_properties_only_get_accessed_once_per_request_in_loop()
+    {
+        Livewire::test(new class extends TestComponent {
+            public $count = 0;
+
+            #[Computed]
+            function foo() {
+                $this->count++;
+
+                return 'bar';
+            }
+
+            function render() {
+                $noop = $this->foo;
+                $noop = $this->foo;
+                $noop = $this->foo;
+
+                return <<<'HTML'
+                    <div>
+                        @foreach(range(0, 3) as $item)
+                            <div>foo{{ $this->foo }}</div>
+                        @endforeach
+                    </div>
+                HTML;
+            }
+        })
+            ->assertSee('foobar')
+            ->assertSetStrict('count', 1)
+            ->call('$refresh')
+            ->assertSetStrict('count', 2);
+    }
+
     function test_can_bust_computed_cache_using_unset()
     {
         Livewire::test(new class extends TestComponent {
